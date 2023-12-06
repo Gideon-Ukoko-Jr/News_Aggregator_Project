@@ -1,0 +1,68 @@
+# config.yaml
+jwt_secret: "defaultsecretKey$23"
+database:
+  useLocal: true
+  local:
+    host: "localhost"
+    port: 5432
+    user: "postgres"
+    dbname: "news_project_test_db"
+    password: "A1b2c3d4e5"
+  prod:
+    host: "yourprodhost"
+    port: 5432
+    user: "yourproduser"
+    dbname: "yourproddbname"
+    password: "yourprodpassword"
+default_preferences:
+  - business
+  - football
+  - health
+  - science
+  - sports
+  - politics
+  - technology
+  - education
+  - fashion
+  - food
+  - football
+  - healthcare-network
+  - lifeandstyle
+  - money
+  - politics
+  - sport
+  - travel
+  - weather
+  - world
+news_api:
+  url: "https://newsapi.org/v2/top-headlines?country=ng&apiKey={apiKey}&category={category}"
+  key: "4ce7ea50a81f4ec9b7f41456fa5b5fe3"
+  categories:
+    - business
+    - entertainment
+    - general
+    - health
+    - science
+    - sports
+    - politics
+    - technology
+
+guardian_news_api:
+  url: "https://content.guardianapis.com/{sectionName}?api-key={apiKey}&from-date={fromDate}&to-date={toDate}&show-fields=thumbnail&page-size=50"
+  key: "1f19be91-4619-472f-b9e4-687fdd28c809"
+  sections:
+    - business
+    - education
+    - fashion
+    - food
+    - football
+    - healthcare-network
+    - lifeandstyle
+    - money
+    - politics
+    - science
+    - sport
+    - technology
+    - travel
+    - weather
+    - world

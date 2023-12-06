@@ -1,0 +1,36 @@
+# config.yaml
+jwt_secret: "defaultsecretKey$23"
+database:
+  useLocal: true
+  local:
+    host: "localhost"
+    port: 5432
+    user: "postgres"
+    dbname: "news_project_test_db"
+    password: "A1b2c3d4e5"
+  prod:
+    host: "yourprodhost"
+    port: 5432
+    user: "yourproduser"
+    dbname: "yourproddbname"
+    password: "yourprodpassword"
+default_preferences:
+  - business
+  - football
+  - health
+  - science
+  - sports
+  - politics
+  - technology
+  - education
+  - fashion
+  - food
+  - football
+  - healthcare-network
+  - lifeandstyle
+  - money
+  - politics
+  - sport
+  - travel
+  - weather
+  - world
