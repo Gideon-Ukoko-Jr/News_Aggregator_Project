@@ -1,5 +1,6 @@
 # config.yaml
 jwt_secret: "defaultsecretKey$23"
+special_key: "secretsauce23214$%"
 database:
   useLocal: true
   local:

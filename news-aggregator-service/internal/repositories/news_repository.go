@@ -3,6 +3,7 @@ package repositories
 import (
 	"gorm.io/gorm"
 	"news-aggregator-service/internal/models"
+	"time"
 )
 
 type NewsContentRepository struct {
@@ -48,6 +49,40 @@ func (ncr *NewsContentRepository) GetPaginatedNewsContent(page, pageSize int) ([
 
 	// Query paginated news content with sorting
 	if err := ncr.db.Offset(offset).Limit(pageSize).Order("updated_at desc").Find(&newsContent).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return newsContent, total, nil
+}
+
+func (ncr *NewsContentRepository) GetPaginatedNewsContentFiltered(page, pageSize int, categories []string, keyword string, publishedAfter time.Time) ([]models.NewsContent, int64, error) {
+	var total int64
+	var newsContent []models.NewsContent
+
+	query := ncr.db.Model(&models.NewsContent{})
+
+	if len(categories) > 0 {
+		query = query.Where("category IN (?)", categories)
+	}
+
+	if keyword != "" {
+		query = query.Where("title ILIKE ?", "%"+keyword+"%")
+	}
+
+	if !publishedAfter.IsZero() {
+		query = query.Where("published_at >= ?", publishedAfter)
+	}
+
+	// Getting total count
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Calculating offset
+	offset := (page - 1) * pageSize
+
+	// Querying paginated news content with sorting
+	if err := query.Offset(offset).Limit(pageSize).Order("published_at desc").Find(&newsContent).Error; err != nil {
 		return nil, 0, err
 	}
 

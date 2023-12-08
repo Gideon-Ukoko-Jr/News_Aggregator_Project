@@ -21,6 +21,8 @@ func main() {
 	utils.InitConfig()
 	db := utils.InitDB()
 
+	utils.InitSpecialKey()
+
 	// Initializing repositories and services
 	newsContentRepository := repositories.NewNewsContentRepository(db)
 	newsService := services.NewNewsService(newsContentRepository)
@@ -55,6 +57,8 @@ func main() {
 
 	// Endpoint to fetch paginated news content
 	router.GET(apiPrefix+"/news", newsHandler.GetNewsContentHandler)
+
+	router.GET(apiPrefix+"/news/filtered", newsHandler.GetPaginatedNewsContentFilteredHandler)
 
 	// Running on port
 	port := ":8081"

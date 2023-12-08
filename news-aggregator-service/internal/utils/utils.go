@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
@@ -12,12 +13,14 @@ import (
 	"gorm.io/gorm/logger"
 	"log"
 	"news-aggregator-service/internal/models"
+	"strconv"
 	"time"
 )
 
 var jwtSecret []byte
 var db *gorm.DB
 var DefaultPreferences []string
+var SpecialKey string
 
 // Representing the configuration for the News API
 type NewsAPIConfig struct {
@@ -136,6 +139,10 @@ func InitDB() *gorm.DB {
 	return db
 }
 
+func InitSpecialKey() {
+	SpecialKey = viper.GetString("special_key")
+}
+
 // Initializing JWT secret key
 func InitJWTSecret() {
 	InitConfig()
@@ -210,4 +217,33 @@ func CalculateTotalPages(totalItems, pageSize int64) int {
 	}
 
 	return int(totalPages)
+}
+
+func ParsePaginationParameters(c *gin.Context) (int, int, error) {
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		return 0, 0, errors.New("invalid page parameter")
+	}
+
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	if err != nil || pageSize < 1 {
+		return 0, 0, errors.New("invalid pageSize parameter")
+	}
+
+	return page, pageSize, nil
+}
+
+// ParseTimeParameter parses and validates a time parameter from the request.
+func ParseTimeParameter(c *gin.Context, paramName string) (time.Time, error) {
+	timeStr := c.Query(paramName)
+	if timeStr == "" {
+		return time.Time{}, nil
+	}
+
+	parsedTime, err := time.Parse(time.RFC3339, timeStr)
+	if err != nil {
+		return time.Time{}, errors.New("invalid " + paramName + " parameter")
+	}
+
+	return parsedTime, nil
 }
