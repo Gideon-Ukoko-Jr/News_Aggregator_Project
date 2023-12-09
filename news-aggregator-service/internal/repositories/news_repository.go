@@ -27,10 +27,10 @@ func (nr *NewsContentRepository) SaveNewsContent(newsContent *models.NewsContent
 func (nr *NewsContentRepository) NewsContentExists(newsContent *models.NewsContent) bool {
 	var count int64
 
-	// Check for similar titles and published date within 24 hours
+	// Check for similar titles (exact match or Levenshtein distance within 4) and published date within 24 hours
 	nr.db.Model(&models.NewsContent{}).
-		Where("levenshtein(title, ?) <= ? AND ABS(EXTRACT(EPOCH FROM (published_at - ?))) <= 86400",
-			newsContent.Title, 4, newsContent.PublishedAt).
+		Where("(title = ? OR levenshtein(title, ?) <= ?) AND ABS(EXTRACT(EPOCH FROM (published_at - ?))) <= 86400",
+			newsContent.Title, newsContent.Title, 4, newsContent.PublishedAt).
 		Count(&count)
 
 	return count > 0
