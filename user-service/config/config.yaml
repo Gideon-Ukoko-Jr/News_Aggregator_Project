@@ -1,7 +1,7 @@
 # config.yaml
 jwt_secret: "defaultsecretKey$23"
 database:
-  useLocal: true
+  useLocal: false
   local:
     host: "localhost"
     port: 5432
@@ -9,11 +9,11 @@ database:
     dbname: "news_project_test_db"
     password: "A1b2c3d4e5"
   prod:
-    host: "yourprodhost"
+    host: "flora.db.elephantsql.com"
     port: 5432
-    user: "yourproduser"
-    dbname: "yourproddbname"
-    password: "yourprodpassword"
+    user: ""
+    dbname: ""
+    password: ""
 default_preferences:
   - business
   - football
