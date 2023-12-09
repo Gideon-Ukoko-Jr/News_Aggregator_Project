@@ -21,6 +21,8 @@ func main() {
 	utils.InitConfig()
 	db := utils.InitDB()
 
+	utils.InitRedis()
+	redisClient := utils.GetRedisClient()
 	utils.InitSpecialKey()
 
 	// Initializing repositories and services
@@ -53,7 +55,7 @@ func main() {
 	router := gin.Default()
 
 	// Initializing test handler for fetching news content
-	newsHandler := handlers.NewNewsHandler(newsContentRepository)
+	newsHandler := handlers.NewNewsHandler(newsContentRepository, redisClient)
 
 	// Endpoint to fetch paginated news content
 	router.GET(apiPrefix+"/news", newsHandler.GetNewsContentHandler)

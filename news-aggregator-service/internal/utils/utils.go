@@ -2,11 +2,13 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
@@ -22,6 +24,8 @@ var jwtSecret []byte
 var db *gorm.DB
 var DefaultPreferences []string
 var SpecialKey string
+var ctx = context.Background()
+var redisClient *redis.Client
 
 // Representing the configuration for the News API
 type NewsAPIConfig struct {
@@ -138,6 +142,42 @@ func InitDB() *gorm.DB {
 
 	db = database
 	return db
+}
+
+type RedisConfig struct {
+	Address  string `mapstructure:"address"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+}
+
+var Redis RedisConfig
+
+// Initializing Redis client
+func InitRedis() {
+	InitConfig()
+
+	Redis = RedisConfig{
+		Address:  viper.GetString("redis.address"),
+		Username: viper.GetString("redis.username"),
+		Password: viper.GetString("redis.password"),
+	}
+
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     Redis.Address,
+		Username: Redis.Username,
+		Password: Redis.Password,
+		DB:       0, // Use default DB
+	})
+
+	// Check connection
+	_, err := redisClient.Ping(ctx).Result()
+	if err != nil {
+		log.Fatalf("Error connecting to Redis: %v", err)
+	}
+}
+
+func GetRedisClient() *redis.Client {
+	return redisClient
 }
 
 func InitSpecialKey() {
