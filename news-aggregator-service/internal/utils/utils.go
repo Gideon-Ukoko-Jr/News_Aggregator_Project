@@ -2,6 +2,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -246,4 +247,12 @@ func ParseTimeParameter(c *gin.Context, paramName string) (time.Time, error) {
 	}
 
 	return parsedTime, nil
+}
+
+func ConvertToJSON(obj interface{}) (string, error) {
+	jsonData, err := json.Marshal(obj)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonData), nil
 }

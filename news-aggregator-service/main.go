@@ -60,6 +60,8 @@ func main() {
 
 	router.GET(apiPrefix+"/news/filtered", newsHandler.GetPaginatedNewsContentFilteredHandler)
 
+	router.GET(apiPrefix+"/news/recent", newsHandler.GetRecentNewsHandler)
+
 	// Running on port
 	port := ":8081"
 	go func() {

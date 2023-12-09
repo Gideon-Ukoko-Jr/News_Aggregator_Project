@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 	"news-aggregator-service/internal/models"
 	"time"
@@ -61,7 +62,12 @@ func (ncr *NewsContentRepository) GetPaginatedNewsContentFiltered(page, pageSize
 
 	query := ncr.db.Model(&models.NewsContent{})
 
-	if len(categories) > 0 {
+	fmt.Println("Categories:", categories)
+	fmt.Println("Categories: Length", len(categories))
+	fmt.Println("Keyword:", keyword)
+	fmt.Println("Published After:", publishedAfter)
+
+	if categories != nil && len(categories) > 0 {
 		query = query.Where("category IN (?)", categories)
 	}
 
@@ -72,7 +78,6 @@ func (ncr *NewsContentRepository) GetPaginatedNewsContentFiltered(page, pageSize
 	if !publishedAfter.IsZero() {
 		query = query.Where("published_at >= ?", publishedAfter)
 	}
-
 	// Getting total count
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -87,4 +92,16 @@ func (ncr *NewsContentRepository) GetPaginatedNewsContentFiltered(page, pageSize
 	}
 
 	return newsContent, total, nil
+}
+
+func (ncr *NewsContentRepository) GetRecentNewsContent(publishedAfter time.Time) ([]models.NewsContent, error) {
+	var newsContent []models.NewsContent
+
+	query := ncr.db.Model(&models.NewsContent{})
+	err := query.Where("published_at >= ?", publishedAfter).Order("published_at desc").Find(&newsContent).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return newsContent, nil
 }

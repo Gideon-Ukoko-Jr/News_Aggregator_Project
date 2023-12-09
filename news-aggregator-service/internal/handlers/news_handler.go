@@ -3,25 +3,25 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	_ "news-aggregator-service/internal/models"
 	"news-aggregator-service/internal/repositories"
 	"news-aggregator-service/internal/utils"
 	"strconv"
 	"strings"
-
-	"github.com/gin-gonic/gin"
+	"time"
 )
 
 const (
 	internalServerError = "Internal Server Error"
 	invalidPageError    = "Invalid page or pageSize"
 	invalidSpecialKey   = "Invalid Special Key"
+	sixHoursInSeconds   = 6 * 60 * 60
 )
 
 type NewsHandler struct {
 	newsContentRepository *repositories.NewsContentRepository
-	specialKey            string
 }
 
 func NewNewsHandler(newsContentRepository *repositories.NewsContentRepository) *NewsHandler {
@@ -85,10 +85,16 @@ func (nh *NewsHandler) GetPaginatedNewsContentFilteredHandler(c *gin.Context) {
 
 	// Parsing and validate categories parameter
 	categoriesString := c.Query("categories")
-	categories := strings.Split(categoriesString, ",")
-	fmt.Println("Categories:")
-	for _, category := range categories {
-		fmt.Println(category)
+	var categories []string
+	if categoriesString != "" {
+		categories = strings.Split(categoriesString, ",")
+		fmt.Println("Categories:")
+		for _, category := range categories {
+			fmt.Println(category)
+		}
+	} else {
+		categories = []string{} // Ensure an empty slice if no categories are provided
+		fmt.Println("Categories: (none)")
 	}
 
 	// Parse and validating keyword parameter
@@ -115,6 +121,31 @@ func (nh *NewsHandler) GetPaginatedNewsContentFilteredHandler(c *gin.Context) {
 		"total":          total,
 		"newsContent":    newsContent,
 		"specialKeyUsed": true,
+	})
+}
+
+func (nh *NewsHandler) GetRecentNewsHandler(c *gin.Context) {
+
+	if !isValidSpecialKey(c.Request.Header.Get("Special-Key")) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": invalidSpecialKey})
+		return
+	}
+
+	// Calculate the time six hours ago from the current time
+	publishedAfter := time.Now().Add(-time.Duration(sixHoursInSeconds) * time.Second)
+
+	println(publishedAfter.GoString())
+
+	// Fetch all news content published within the last six hours
+	recentNews, err := nh.newsContentRepository.GetRecentNewsContent(publishedAfter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": internalServerError})
+		return
+	}
+
+	// Respond with the recent news content
+	c.JSON(http.StatusOK, gin.H{
+		"recentNews": recentNews,
 	})
 }
 
