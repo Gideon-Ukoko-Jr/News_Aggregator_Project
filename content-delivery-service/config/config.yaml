@@ -1,3 +1,3 @@
 special_key: "secretsauce23214$%"
-user_service_fetch_preference_url: "http://localhost:8080/api/v1/user/user-news-preferences"
-news_aggregator_recent_news_url: "http://localhost:8081/api/v1/news-aggregator/news/recent"
+user_service_fetch_preference_url: "https://user-service-4ykn.onrender.com/api/v1/user/user-news-preferences"
+news_aggregator_recent_news_url: "https://news-aggregator-service.onrender.com/api/v1/news-aggregator/news/recent"
